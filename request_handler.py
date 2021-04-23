@@ -1,6 +1,6 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from movies.requests import get_all_movies, get_movies_by_year
+from movies.requests import create_movie, get_all_movies, get_movies_by_year
 
 class HandleRequests(BaseHTTPRequestHandler):
     def parse_url(self, path):
@@ -44,6 +44,21 @@ class HandleRequests(BaseHTTPRequestHandler):
             self.wfile.write(response.encode())
         else:
             self._set_headers(404)
+
+    def do_POST(self):
+        content_len = int(self.headers.get('content-length', 0))
+        post_body = self.rfile.read(content_len)
+        post_body = json.loads(post_body)
+        response = None
+        if self.path == '/movies':
+            response = create_movie(post_body)
+
+        if response:
+            self._set_headers(201)
+            self.wfile.write(response.encode())
+        else:
+            self._set_headers(404)
+
         
     
     

@@ -76,6 +76,30 @@ def get_movies_by_year(year):
 
         return json.dumps(movies)
 
+def create_movie(new_movie):
+    # {
+        # "title": "new movie name"
+        # actors: [1, 2, 3]
+    # }
+    with sqlite3.connect('./movies.db') as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+            INSERT INTO Movie
+            VALUES (null, ?, ?, ?)
+        """, (new_movie['title'], new_movie['year'], new_movie['genre_id']))
+
+        id = db_cursor.lastrowid
+
+        for actor_id in new_movie['actors']:
+            db_cursor.execute("""
+                INSERT INTO Movie_Actor
+                VALUES (null, ?, ?)
+            """, (id, actor_id))
+        
+        new_movie['id'] = id
+        return json.dumps(new_movie)
+
 
     
 
